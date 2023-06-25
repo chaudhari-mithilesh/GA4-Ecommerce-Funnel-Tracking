@@ -27,7 +27,8 @@
  * @subpackage Ga4_Ecommerce_Funnel_Tracking/includes
  * @author     WisdmLabs <software@wisdmlabs.com>
  */
-class Ga4_Ecommerce_Funnel_Tracking {
+class Ga4_Ecommerce_Funnel_Tracking
+{
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -66,8 +67,9 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct() {
-		if ( defined( 'GA4_ECOMMERCE_FUNNEL_TRACKING_VERSION' ) ) {
+	public function __construct()
+	{
+		if (defined('GA4_ECOMMERCE_FUNNEL_TRACKING_VERSION')) {
 			$this->version = GA4_ECOMMERCE_FUNNEL_TRACKING_VERSION;
 		} else {
 			$this->version = '1.0.0';
@@ -78,7 +80,6 @@ class Ga4_Ecommerce_Funnel_Tracking {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-
 	}
 
 	/**
@@ -97,33 +98,33 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function load_dependencies()
+	{
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ga4-ecommerce-funnel-tracking-loader.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-ga4-ecommerce-funnel-tracking-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ga4-ecommerce-funnel-tracking-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-ga4-ecommerce-funnel-tracking-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-ga4-ecommerce-funnel-tracking-admin.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-ga4-ecommerce-funnel-tracking-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-ga4-ecommerce-funnel-tracking-public.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-ga4-ecommerce-funnel-tracking-public.php';
 
 		$this->loader = new Ga4_Ecommerce_Funnel_Tracking_Loader();
-
 	}
 
 	/**
@@ -135,12 +136,12 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() {
+	private function set_locale()
+	{
 
 		$plugin_i18n = new Ga4_Ecommerce_Funnel_Tracking_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
+		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
 
 	/**
@@ -150,13 +151,13 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function define_admin_hooks()
+	{
 
-		$plugin_admin = new Ga4_Ecommerce_Funnel_Tracking_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Ga4_Ecommerce_Funnel_Tracking_Admin($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 	}
 
 	/**
@@ -166,13 +167,18 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() {
+	private function define_public_hooks()
+	{
 
-		$plugin_public = new Ga4_Ecommerce_Funnel_Tracking_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Ga4_Ecommerce_Funnel_Tracking_Public($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+		$this->loader->add_action('wp_head', $plugin_public, 'gtm_head_script');
+		$this->loader->add_action('wp_body_open', $plugin_public, 'gtm_body_script');
+		$this->loader->add_action('wpforms_frontend_confirmation_message_after', $plugin_public, 'wp_form_tracking', 10, 3);
+		$this->loader->add_action('woocommerce_add_to_cart', $plugin_public, 'add_to_cart_event', 1, 3);
+		$this->loader->add_action('wp', $plugin_public, 'list_shop_page_products');
 	}
 
 	/**
@@ -180,7 +186,8 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() {
+	public function run()
+	{
 		$this->loader->run();
 	}
 
@@ -191,7 +198,8 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name()
+	{
 		return $this->plugin_name;
 	}
 
@@ -201,7 +209,8 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 * @since     1.0.0
 	 * @return    Ga4_Ecommerce_Funnel_Tracking_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader()
+	{
 		return $this->loader;
 	}
 
@@ -211,8 +220,8 @@ class Ga4_Ecommerce_Funnel_Tracking {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function get_version()
+	{
 		return $this->version;
 	}
-
 }

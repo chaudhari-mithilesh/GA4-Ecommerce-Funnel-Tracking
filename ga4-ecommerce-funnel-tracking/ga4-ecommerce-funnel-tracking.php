@@ -26,7 +26,7 @@
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
+if (!defined('WPINC')) {
 	die;
 }
 
@@ -35,14 +35,15 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'GA4_ECOMMERCE_FUNNEL_TRACKING_VERSION', '1.0.0' );
+define('GA4_ECOMMERCE_FUNNEL_TRACKING_VERSION', '1.0.0');
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-ga4-ecommerce-funnel-tracking-activator.php
  */
-function activate_ga4_ecommerce_funnel_tracking() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ga4-ecommerce-funnel-tracking-activator.php';
+function activate_ga4_ecommerce_funnel_tracking()
+{
+	require_once plugin_dir_path(__FILE__) . 'includes/class-ga4-ecommerce-funnel-tracking-activator.php';
 	Ga4_Ecommerce_Funnel_Tracking_Activator::activate();
 }
 
@@ -50,19 +51,20 @@ function activate_ga4_ecommerce_funnel_tracking() {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-ga4-ecommerce-funnel-tracking-deactivator.php
  */
-function deactivate_ga4_ecommerce_funnel_tracking() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ga4-ecommerce-funnel-tracking-deactivator.php';
+function deactivate_ga4_ecommerce_funnel_tracking()
+{
+	require_once plugin_dir_path(__FILE__) . 'includes/class-ga4-ecommerce-funnel-tracking-deactivator.php';
 	Ga4_Ecommerce_Funnel_Tracking_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_ga4_ecommerce_funnel_tracking' );
-register_deactivation_hook( __FILE__, 'deactivate_ga4_ecommerce_funnel_tracking' );
+register_activation_hook(__FILE__, 'activate_ga4_ecommerce_funnel_tracking');
+register_deactivation_hook(__FILE__, 'deactivate_ga4_ecommerce_funnel_tracking');
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-ga4-ecommerce-funnel-tracking.php';
+require plugin_dir_path(__FILE__) . 'includes/class-ga4-ecommerce-funnel-tracking.php';
 
 /**
  * Begins execution of the plugin.
@@ -73,10 +75,10 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-ga4-ecommerce-funnel-track
  *
  * @since    1.0.0
  */
-function run_ga4_ecommerce_funnel_tracking() {
+function run_ga4_ecommerce_funnel_tracking()
+{
 
 	$plugin = new Ga4_Ecommerce_Funnel_Tracking();
 	$plugin->run();
-
 }
 run_ga4_ecommerce_funnel_tracking();
