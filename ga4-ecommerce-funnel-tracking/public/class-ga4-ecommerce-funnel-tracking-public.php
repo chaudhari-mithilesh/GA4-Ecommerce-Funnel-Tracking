@@ -206,7 +206,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 				'item_name' => $product_data['name'],
 				'index' => $index,
 				'discount' => 0,
-				'item_brand' => bloginfo('name'),
+				'item_brand' => get_bloginfo('name'),
 				'item_category' => 'Uncategorized',
 				'price' => floatval($product_data['price']),
 				'quantity' => 1,
@@ -297,7 +297,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 			'item_id' => $product->get_id(),
 			'item_name' => $product_data['name'],
 			'discount' => 0,
-			'item_brand' => bloginfo('name'),
+			'item_brand' => get_bloginfo('name'),
 			'item_category' => 'Uncategorized',
 			'price' => floatval($product_data['price']),
 		);
@@ -317,53 +317,168 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		wp_localize_script('single_product_view', 'data', $item_data);
 	}
 
-	// public function checkout_event()
-	// {
-	// 	if (!is_checkout()) {
-	// 		return;
-	// 	}
+	/**
+	 * Handles the event when the cart page is viewed.
+	 *
+	 * This function is triggered when the cart page is viewed. It retrieves
+	 * the necessary data for tracking the products in the cart, such as
+	 * product information, price, and quantity. It then enqueues the script
+	 * responsible for handling the tracking.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
 
-	// 	$cart = WC()->cart;
-	// 	$cart_items = $cart->get_cart();
-
-	// 	$data = array();
-	// 	foreach($cart_items as $cart_item_key => $cart_item) {
-	// 		$product_id = $cart_item['product_id'];
-	// 		$quantity = $cart_item['quantity'];
-	// 		$product = $cart_item['data'];
-	// 		$data[] = array(
-	// 			'currency' => get_woocommerce_currency(),
-
-	// 		)
-	// 	}
-	// }
-
-
-	function remove_from_cart_event($cart_item_key)
+	public function view_cart_event()
 	{
-		die("Item Removed From Cart.");
-		$cart = WC()->cart;
-		$removed_item = $cart->get_removed_cart_item($cart_item_key);
-		$product_id = $removed_item['product_id'];
-		$request_quantity = $removed_item['quantity'];
+		// die("Stopped");
+		if (!is_cart()) {
+			return;
+		}
 
-		$product_data = wc_get_product($product_id);
-		$category_ids = $product_data->get_category_ids();
-
+		$woocommerce = WC();
 		$data = array(
 			'currency' => get_woocommerce_currency(),
-			'value' => (float) $product_data->get_price(),
-			'item' => array(
-				'item_id' => (string) $product_id,
-				'item_name' => $product_data->get_name(),
-				'item_brand' => "Earth Store",
-				'item_category' => !empty($category_ids) ? get_term($category_ids[0], 'product_cat')->name : "Uncategorized",
-				'price' => (float) $product_data->get_price(),
-				'quantity' => $request_quantity
-			)
+			'items' => array(),
+			// 'coupon_code' => '',
 		);
 
-		wp_enqueue_script('remove_from_cart', plugin_dir_url(__FILE__) . 'js/remove_from_cart.js', array('jquery'), $this->version, false);
-		wp_localize_script('remove_from_cart', 'item_data', $data);
+		foreach ($woocommerce->cart->get_cart() as $cart_item_key => $cart_item) {
+			$product = $cart_item['data'];
+			$product_data = $product->get_data();
+
+			$item_data = array(
+				'item_id' => $product->get_id(),
+				'item_name' => $product_data['name'],
+				'discount' => 0,
+				'item_brand' => get_bloginfo('name'),
+				'item_category' => 'Uncategorized',
+				'price' => floatval($product_data['price']),
+				'quantity' => $cart_item['quantity'],
+			);
+
+			if ($product->get_sale_price() !== '') {
+				$discount_amount = $product->get_regular_price() - $product->get_sale_price();
+				$item_data['discount'] = $discount_amount;
+			}
+
+			$category_ids = $product->get_category_ids();
+			if (!empty($category_ids)) {
+				$category = get_term($category_ids[0], 'product_cat');
+				$item_data['item_category'] = $category->name;
+			}
+
+			$data['items'][] = $item_data;
+		}
+		// if ($woocommerce->cart->applied_coupons) {
+		// 	$coupon_codes = $woocommerce->cart->get_coupons();
+		// 	$data['coupon_code'] = reset($coupon_codes)->get_code();
+		// }
+		wp_enqueue_script('view_cart', plugin_dir_url(__FILE__) . 'js/view_cart.js', array('jquery'), $this->version, false);
+		wp_localize_script('view_cart', 'cart_data', $data);
+	}
+
+	/**
+	 * Handles the event when the checkout page is viewed.
+	 *
+	 * This function is triggered when the checkout page is viewed. It retrieves
+	 * the necessary data for tracking the products in the cart, such as
+	 * product information, price, and quantity. It then enqueues the script
+	 * responsible for handling the tracking.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return void
+	 */
+
+	public function checkout_event()
+	{
+		if (!is_checkout()) {
+			return;
+		}
+
+		$woocommerce = WC();
+		$data = array(
+			'currency' => get_woocommerce_currency(),
+			'items' => array(),
+			'coupon_code' => 'Not Applied',
+		);
+
+		foreach ($woocommerce->cart->get_cart() as $cart_item_key => $cart_item) {
+			$product = $cart_item['data'];
+			$product_data = $product->get_data();
+
+			$item_data = array(
+				'item_id' => $product->get_id(),
+				'item_name' => $product_data['name'],
+				'discount' => 0,
+				'item_brand' => get_bloginfo('name'),
+				'item_category' => 'Uncategorized',
+				'price' => floatval($product_data['price']),
+				'quantity' => $cart_item['quantity'],
+			);
+
+			if ($product->get_sale_price() !== '') {
+				$discount_amount = $product->get_regular_price() - $product->get_sale_price();
+				$item_data['discount'] = $discount_amount;
+			}
+
+			$category_ids = $product->get_category_ids();
+			if (!empty($category_ids)) {
+				$category = get_term($category_ids[0], 'product_cat');
+				$item_data['item_category'] = $category->name;
+			}
+
+			$data['items'][] = $item_data;
+		}
+
+		$applied_coupons = $woocommerce->cart->get_applied_coupons();
+		if (!empty($applied_coupons)) {
+			$data['coupon_codes'] = $applied_coupons;
+		}
+
+		if ($woocommerce->cart->applied_coupons) {
+			$coupon_codes = $woocommerce->cart->get_coupons();
+			$data['coupon_code'] = reset($coupon_codes)->get_code();
+		}
+
+
+		wp_enqueue_script('checkout_event', plugin_dir_url(__FILE__) . 'js/checkout.js', array('jquery'), $this->version, false);
+		wp_localize_script('checkout_event', 'cart_data', $data);
+	}
+
+	/**
+	 * Handles the event when the purchase is completed.
+	 *
+	 * This function is triggered when an order is placed and the purchase is completed.
+	 * It retrieves the necessary order details such as order number, total, billing email,
+	 * billing phone, payment method, country, and customer ID. It then enqueues the script
+	 * responsible for handling the completion tracking.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $order_id The ID of the completed order.
+	 * @return void
+	 */
+
+	public function purchase_event($order_id)
+	{
+		// die("Hello");
+		$order = wc_get_order($order_id);
+		// var_dump($order);
+
+		$order_details = array(
+			'order_number' => $order->get_order_number(),
+			'order_total' => $order->get_total(),
+			'billing_email' => $order->get_billing_email(),
+			'billing_phone' => $order->get_billing_phone(),
+			'payment_method' => $order->get_payment_method_title(),
+			'country' => $order->get_billing_country(),
+			'customer_id' => $order->get_customer_id(),
+		);
+
+		wp_enqueue_script('purchase_complete', plugin_dir_url(__FILE__) . 'js/purchase_complete.js', array('jquery'), $this->version, false);
+		wp_localize_script('purchase_complete', 'order_data', $order_details);
 	}
 }

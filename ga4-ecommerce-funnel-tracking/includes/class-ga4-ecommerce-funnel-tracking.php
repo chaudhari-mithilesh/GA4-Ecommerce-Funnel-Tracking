@@ -180,6 +180,13 @@ class Ga4_Ecommerce_Funnel_Tracking
 		$this->loader->add_action('woocommerce_add_to_cart', $plugin_public, 'add_to_cart_event', 1, 3);
 		$this->loader->add_action('wp', $plugin_public, 'list_shop_page_products');
 		$this->loader->add_action('woocommerce_before_single_product', $plugin_public, 'view_single_product_event');
+		$this->loader->add_action('woocommerce_before_cart', $plugin_public, 'view_cart_event');
+		$this->loader->add_action('woocommerce_cart_updated', $plugin_public, 'view_cart_event');
+		$this->loader->add_action('wp_ajax_apply_coupon', $plugin_public, 'view_cart_event');
+		$this->loader->add_action('wp_ajax_nopriv_apply_coupon', $plugin_public, 'view_cart_event');
+		$this->loader->add_action('woocommerce_before_checkout_form', $plugin_public, 'checkout_event');
+		$this->loader->add_action('woocommerce_thankyou', $plugin_public, 'purchase_event', 10, 1);
+		$this->loader->add_action('woocommerce_remove_cart_item', $plugin_public, 'remove_from_cart_event', 10, 1);
 	}
 
 	/**
