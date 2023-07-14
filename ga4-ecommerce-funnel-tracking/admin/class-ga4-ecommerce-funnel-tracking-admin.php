@@ -20,7 +20,8 @@
  * @subpackage Ga4_Ecommerce_Funnel_Tracking/admin
  * @author     WisdmLabs <software@wisdmlabs.com>
  */
-class Ga4_Ecommerce_Funnel_Tracking_Admin {
+class Ga4_Ecommerce_Funnel_Tracking_Admin
+{
 
 	/**
 	 * The ID of this plugin.
@@ -47,11 +48,11 @@ class Ga4_Ecommerce_Funnel_Tracking_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct($plugin_name, $version)
+	{
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-
 	}
 
 	/**
@@ -59,7 +60,8 @@ class Ga4_Ecommerce_Funnel_Tracking_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -73,8 +75,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/ga4-ecommerce-funnel-tracking-admin.css', array(), $this->version, 'all' );
-
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/ga4-ecommerce-funnel-tracking-admin.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -82,7 +83,8 @@ class Ga4_Ecommerce_Funnel_Tracking_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts()
+	{
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -96,8 +98,65 @@ class Ga4_Ecommerce_Funnel_Tracking_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/ga4-ecommerce-funnel-tracking-admin.js', array( 'jquery' ), $this->version, false );
-
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/ga4-ecommerce-funnel-tracking-admin.js', array('jquery'), $this->version, false);
 	}
 
+	public function gtm_script_menu()
+	{
+		add_menu_page(
+			'GTM Scripts',
+			'GA4 Ecommerce Funnel Tracking',
+			'manage_options',
+			'wdm-ga4-menu',
+			array($this, 'gtm_scripts_settings'),
+			'dashicons-tag'
+		);
+	}
+
+	// public function gtm_scripts_settings()
+	// {
+	// 	echo '<h1>' . get_admin_page_title() . '</h1>';
+	// 	echo '<div><h3>Add GTM Scripts Here</h3></div>';
+	// 	echo '<form method="post">';
+	// 	echo '<label for="gtm-head-script">GTM Head Script: </label>';
+	// 	echo '<texarea name="gtm-head-script"></textarea>';
+	// 	echo '<br><br>';
+	// 	echo '<label for="gtm-body-script">GTM Body Script: </label>';
+	// 	echo '<texarea name="gtm-body-script"></textarea>';
+	// 	submit_button();
+	// 	echo '</form>';
+	// }
+
+	public function gtm_scripts_settings()
+	{
+		echo '<div class="wrap">';
+		echo '<h1>' . get_admin_page_title() . '</h1>';
+		echo '<form method="post" action="options.php">';
+		settings_fields('gtm_scripts_options');
+		do_settings_sections('gtm_scripts');
+		submit_button();
+		echo '</form>';
+		echo '</div>';
+	}
+
+	public function gtm_scripts_init()
+	{
+		register_setting('gtm_scripts_options', 'gtm_head_script');
+		register_setting('gtm_scripts_options', 'gtm_body_script');
+		add_settings_section('gtm_scripts_section', 'GTM Scripts', '', 'gtm_scripts');
+		add_settings_field('gtm_head_script', 'GTM Head Script', array($this, 'gtm_head_script_callback'), 'gtm_scripts', 'gtm_scripts_section');
+		add_settings_field('gtm_body_script', 'GTM Body Script', array($this, 'gtm_body_script_callback'), 'gtm_scripts', 'gtm_scripts_section');
+	}
+
+	public function gtm_head_script_callback()
+	{
+		$gtm_head_script = get_option('gtm_head_script');
+		echo '<textarea name="gtm_head_script" rows="5" cols="50">' . esc_textarea($gtm_head_script) . '</textarea>';
+	}
+
+	public function gtm_body_script_callback()
+	{
+		$gtm_body_script = get_option('gtm_body_script');
+		echo '<textarea name="gtm_body_script" rows="5" cols="50">' . esc_textarea($gtm_body_script) . '</textarea>';
+	}
 }

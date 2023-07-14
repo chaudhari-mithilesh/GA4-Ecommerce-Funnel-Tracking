@@ -99,7 +99,8 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		 */
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/ga4-ecommerce-funnel-tracking-public.js', array('jquery'), $this->version, false);
-		wp_enqueue_script('wp-form-tracking-js', plugin_dir_url(__FILE__) . 'js/wp-form-tracking.js', array('jquery'), $this->version, false);
+		// wp_enqueue_script('ga4_form_event', plugin_dir_url(__FILE__) . 'js/ga4_form_event.js', array(), $this->version, false);
+		// wp_enqueue_script('wp-form-tracking-js', plugin_dir_url(__FILE__) . 'js/wp-form-tracking.js', array('jquery'), $this->version, false);
 	}
 
 	/**
@@ -133,7 +134,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 	{
 ?>
 		<!-- Google Tag Manager (noscript) -->
-		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5T4FGTL" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PCXS9RF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		<!-- End Google Tag Manager (noscript) -->
 	<?php
 	}
@@ -162,7 +163,53 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 				},
 			});
 		</script>
+	<?php
+	}
+
+	public function gform_tracking($confirmation, $form, $entry, $ajax)
+	{
+		// echo "Hello";
+		// die('Hello');
+		$name = '';
+		$email = '';
+		foreach ($form['fields'] as $field) {
+			if ($field->label === 'Name') {
+				$name = $entry[$field->id];
+			}
+			if ($field->label === 'Email') {
+				$email = $entry[$field->id];
+			}
+		}
+
+		$data = array(
+			'name'  => $name,
+			'email' => $email,
+		);
+
+		ob_start()
+	?>
+		<script>
+			console.log("form-tracking-file");
+			var form_data = <?php echo json_encode($data); ?>;
+			dataLayer.push({
+				event: "wp_form_tracking",
+				ecommerce: {
+					name: form_data["name"],
+					email: form_data["email"],
+				},
+			});
+		</script>
 <?php
+		$tracking_script = ob_get_clean();
+		// echo $tracking_script;
+
+		$confirmation .= $tracking_script;
+
+		// wp_enqueue_script('ga4_form_event', plugin_dir_url(__FILE__) . 'js/ga4_form_event.js', array('jquery'), $this->version, false);
+		// var_dump($value);
+		// die();
+		// wp_localize_script('ga4_form_event', 'form_data', $data);
+		return $confirmation;
 	}
 
 	/**

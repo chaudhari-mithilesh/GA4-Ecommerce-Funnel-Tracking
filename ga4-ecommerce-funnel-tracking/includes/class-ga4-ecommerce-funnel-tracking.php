@@ -158,6 +158,8 @@ class Ga4_Ecommerce_Funnel_Tracking
 
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+		$this->loader->add_action('admin_menu', $plugin_admin, 'gtm_script_menu');
+		$this->loader->add_action('admin_init', $plugin_admin, 'gtm_scripts_init');
 	}
 
 	/**
@@ -171,9 +173,9 @@ class Ga4_Ecommerce_Funnel_Tracking
 	{
 
 		$plugin_public = new Ga4_Ecommerce_Funnel_Tracking_Public($this->get_plugin_name(), $this->get_version());
-
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+
 		$this->loader->add_action('wp_head', $plugin_public, 'gtm_head_script');
 		$this->loader->add_action('wp_body_open', $plugin_public, 'gtm_body_script');
 		$this->loader->add_action('wpforms_frontend_confirmation_message_after', $plugin_public, 'wp_form_tracking', 10, 3);
@@ -181,12 +183,13 @@ class Ga4_Ecommerce_Funnel_Tracking
 		$this->loader->add_action('wp', $plugin_public, 'list_shop_page_products');
 		$this->loader->add_action('woocommerce_before_single_product', $plugin_public, 'view_single_product_event');
 		$this->loader->add_action('woocommerce_before_cart', $plugin_public, 'view_cart_event');
-		$this->loader->add_action('woocommerce_cart_updated', $plugin_public, 'view_cart_event');
-		$this->loader->add_action('wp_ajax_apply_coupon', $plugin_public, 'view_cart_event');
-		$this->loader->add_action('wp_ajax_nopriv_apply_coupon', $plugin_public, 'view_cart_event');
 		$this->loader->add_action('woocommerce_before_checkout_form', $plugin_public, 'checkout_event');
 		$this->loader->add_action('woocommerce_thankyou', $plugin_public, 'purchase_event', 10, 1);
-		$this->loader->add_action('woocommerce_remove_cart_item', $plugin_public, 'remove_from_cart_event', 10, 1);
+		// $this->loader->add_action('woocommerce_remove_cart_item', $plugin_public, 'remove_from_cart_event', 10, 1);
+		// $this->loader->add_action('gform_after_submission', $plugin_public, 'gform_tracking', 10, 2);
+		// $this->loader->add_filter('gform_confirmation', $plugin_public, 'gform_tracking', 10, 4);
+		// $this->loader->add_action('gform_pre_handle_confirmation', $plugin_public, 'gform_tracking', 10, 3);
+		// $this->loader->add_filter('gform_entry_post_save', $plugin_public, 'gform_tracking', 10, 2);
 	}
 
 	/**
