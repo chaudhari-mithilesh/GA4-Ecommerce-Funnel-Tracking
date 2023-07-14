@@ -113,20 +113,6 @@ class Ga4_Ecommerce_Funnel_Tracking_Admin
 		);
 	}
 
-	// public function gtm_scripts_settings()
-	// {
-	// 	echo '<h1>' . get_admin_page_title() . '</h1>';
-	// 	echo '<div><h3>Add GTM Scripts Here</h3></div>';
-	// 	echo '<form method="post">';
-	// 	echo '<label for="gtm-head-script">GTM Head Script: </label>';
-	// 	echo '<texarea name="gtm-head-script"></textarea>';
-	// 	echo '<br><br>';
-	// 	echo '<label for="gtm-body-script">GTM Body Script: </label>';
-	// 	echo '<texarea name="gtm-body-script"></textarea>';
-	// 	submit_button();
-	// 	echo '</form>';
-	// }
-
 	public function gtm_scripts_settings()
 	{
 		echo '<div class="wrap">';

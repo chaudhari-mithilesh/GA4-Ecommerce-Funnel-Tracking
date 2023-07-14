@@ -116,7 +116,12 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 
 	public function gtm_head_script()
 	{
-		wp_enqueue_script('gtm-head-script', plugin_dir_url(__FILE__) . '/js/gtm_head_script.js', array(), $this->version, false);
+		// wp_enqueue_script('gtm-head-script', plugin_dir_url(__FILE__) . '/js/gtm_head_script.js', array(), $this->version, false);
+
+		$gtm_head_script = get_option('gtm_head_script');
+		if (!empty($gtm_head_script)) {
+			echo $gtm_head_script;
+		}
 	}
 
 	/**
@@ -132,11 +137,10 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 
 	public function gtm_body_script()
 	{
-?>
-		<!-- Google Tag Manager (noscript) -->
-		<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PCXS9RF" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-		<!-- End Google Tag Manager (noscript) -->
-	<?php
+		$gtm_body_script = get_option('gtm_body_script');
+		if (!empty($gtm_body_script)) {
+			echo $gtm_body_script;
+		}
 	}
 
 	public function wp_form_tracking($confirmation, $form_data, $fields)
@@ -150,7 +154,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		// wp_enqueue_script('ga4_form_event', plugin_dir_url(__FILE__) . 'js/ga4_form_event.js', array(), $this->version, false);
 		// wp_localize_script('ga4_form_event', 'form_data', $data);
 
-	?>
+?>
 		<script>
 			console.log("form-tracking-file");
 			var form_data = <?php echo json_encode($data); ?>;
