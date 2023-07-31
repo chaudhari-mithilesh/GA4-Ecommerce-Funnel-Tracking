@@ -8,7 +8,9 @@ jQuery(document).ready(function ($) {
       var form_data = form_data_object; // Assuming form_data_object is passed from PHP to the script
       console.log(form_data.form_fields);
       dataLayer.push({
-        event: form_data.form_title ? form_data.form_title : "form_tracking",
+        event: form_data.form_title
+          ? form_data.form_title + " form_tracking"
+          : "form_tracking",
         ecommerce: {
           form_title: form_data.form_title,
           form_fields: form_data.form_fields,

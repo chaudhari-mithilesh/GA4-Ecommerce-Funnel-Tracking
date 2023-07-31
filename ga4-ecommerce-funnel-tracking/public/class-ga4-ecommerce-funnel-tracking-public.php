@@ -145,76 +145,61 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 
 	public function wp_form_tracking($confirmation, $form_data, $fields)
 	{
-		// die('Function called');
-		$data = array();
-		$data['name'] = $fields[0]['value'];
-		$data['email'] = $fields[1]['value'];
-		$data['comment'] = $fields[2]['value'];
+		// Get the user's information from the form submission
+		$form_title = $form_data['title'];
+		$field_values = array();
 
-		// wp_enqueue_script('ga4_form_event', plugin_dir_url(__FILE__) . 'js/ga4_form_event.js', array(), $this->version, false);
-		// wp_localize_script('ga4_form_event', 'form_data', $data);
+		// Iterate through the form fields and extract values based on the field labels
+		foreach ($fields as $field) {
+			$value = isset($field['value']) ? $field['value'] : '';
+			$field_values[$field['name']] = $value;
+		}
+
+		// Prepare the data to be sent to Google Analytics
+		$data = array(
+			'form_title'  => $form_title,
+			'form_fields' => $field_values,
+		);
 
 ?>
 		<script>
 			console.log("form-tracking-file");
 			var form_data = <?php echo json_encode($data); ?>;
 			dataLayer.push({
-				event: "wp_form_tracking",
+				event: form_data.form_title ?
+					form_data.form_title + " form_tracking" : "form_tracking",
 				ecommerce: {
-					name: form_data["name"],
-					email: form_data["email"],
-					comment: form_data["comment"],
-				},
-			});
-		</script>
-	<?php
-	}
-
-	public function gform_tracking($confirmation, $form, $entry, $ajax)
-	{
-		// echo "Hello";
-		// die('Hello');
-		$name = '';
-		$email = '';
-		foreach ($form['fields'] as $field) {
-			if ($field->label === 'Name') {
-				$name = $entry[$field->id];
-			}
-			if ($field->label === 'Email') {
-				$email = $entry[$field->id];
-			}
-		}
-
-		$data = array(
-			'name'  => $name,
-			'email' => $email,
-		);
-
-		ob_start()
-	?>
-		<script>
-			console.log("form-tracking-file");
-			var form_data = <?php echo json_encode($data); ?>;
-			dataLayer.push({
-				event: "wp_form_tracking",
-				ecommerce: {
-					name: form_data["name"],
-					email: form_data["email"],
+					form_title: form_data.form_title,
+					form_fields: form_data.form_fields,
 				},
 			});
 		</script>
 <?php
-		$tracking_script = ob_get_clean();
-		// echo $tracking_script;
-
-		$confirmation .= $tracking_script;
-
-		// wp_enqueue_script('ga4_form_event', plugin_dir_url(__FILE__) . 'js/ga4_form_event.js', array('jquery'), $this->version, false);
-		// var_dump($value);
-		// die();
-		// wp_localize_script('ga4_form_event', 'form_data', $data);
-		return $confirmation;
 	}
+
+	function gform_tracking($entry, $form)
+	{
+		// Get the user's information from the form submission
+		$form_title = $form['title'];
+		$field_values = array();
+
+		// Iterate through the form fields and extract values based on the field labels
+		foreach ($form["fields"] as $field) {
+			$value = rgar($entry, $field->id);
+			$field_values[$field->label] = $value;
+		}
+
+		// Prepare the data to be sent to Google Analytics
+		$data = array(
+			'form_title'  => $form_title,
+			'form_fields' => $field_values,
+		);
+
+		// Enqueue the JavaScript file and pass the form data as an object to the script
+		wp_enqueue_script('form_tracking_script', plugin_dir_url(__FILE__) . 'js/gform_tracking.js', array(), '1.0', true);
+		wp_localize_script('form_tracking_script', 'form_data_object', $data);
+	}
+
 
 	/**
 	 * Lists and enqueues products on the shop page for tracking purposes.
@@ -233,48 +218,40 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		if (!is_shop()) {
 			return;
 		}
-
 		$data = array(
 			'currency' => get_woocommerce_currency(),
-			'item_list_id' => '12345',
-			'item_list_name' => 'All Products',
 			'items' => array(),
 		);
 
-		$args = array(
-			'post_type' => 'product',
-			'posts_per_page' => -1,
-		);
-		$products = wc_get_products($args);
+		if (have_posts()) {
+			while (have_posts()) {
+				the_post();
+				$product = wc_get_product(get_the_ID());
+				$product_data = $product->get_data();
 
-		foreach ($products as $index => $product) {
-			$product_data = $product->get_data();
+				$item_data = array(
+					'item_id' => $product->get_id(),
+					'item_name' => $product_data['name'],
+					'discount' => 0,
+					'item_brand' => get_bloginfo('name'),
+					'item_category' => 'Uncategorized',
+					'price' => floatval($product_data['price']),
+					'quantity' => 1,
+				);
 
-			$item_data = array(
-				'item_list_id' => '12345',
-				'item_list_name' => 'All Products',
-				'item_id' => $product->get_id(),
-				'item_name' => $product_data['name'],
-				'index' => $index,
-				'discount' => 0,
-				'item_brand' => get_bloginfo('name'),
-				'item_category' => 'Uncategorized',
-				'price' => floatval($product_data['price']),
-				'quantity' => 1,
-			);
+				if ($product->get_sale_price() !== '') {
+					$discount_amount = $product->get_regular_price() - $product->get_sale_price();
+					$item_data['discount'] = $discount_amount;
+				}
 
-			if ($product->get_sale_price() !== '') {
-				$discount_amount = $product->get_regular_price() - $product->get_sale_price();
-				$item_data['discount'] = $discount_amount;
+				$category_ids = $product->get_category_ids();
+				if (!empty($category_ids)) {
+					$category = get_term($category_ids[0], 'product_cat');
+					$item_data['item_category'] = $category->name;
+				}
+
+				$data['items'][] = $item_data;
 			}
-
-			$category_ids = $product->get_category_ids();
-			if (!empty($category_ids)) {
-				$category = get_term($category_ids[0], 'product_cat');
-				$item_data['item_category'] = $category->name;
-			}
-
-			$data['items'][] = $item_data;
 		}
 
 		wp_enqueue_script('list_shop_page_products', plugin_dir_url(__FILE__) . 'js/list_shop_page_products.js', array('jquery'), $this->version, false);
@@ -531,5 +508,43 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 
 		wp_enqueue_script('purchase_complete', plugin_dir_url(__FILE__) . 'js/purchase_complete.js', array('jquery'), $this->version, false);
 		wp_localize_script('purchase_complete', 'order_data', $order_details);
+	}
+
+	// Custom functions for tracking data from the site
+
+	public function add_to_caledar_event($parameters, $event_id)
+	{
+		// Get the event object using the event ID
+		$event = get_post($event_id);
+
+		$data = array();
+
+		if ($event) {
+
+			// Extract event details
+			$event_title = $event->post_title;
+			$event_start_date = get_post_meta($event_id, '_EventStartDate', true);
+			$event_end_date = get_post_meta($event_id, '_EventEndDate', true);
+
+			// Your code to handle event details or save status
+			// ...
+
+			// Example: Check if the event is saved in the calendar
+			$is_saved_in_calendar = false; // Set this to true if the event is saved in the user's calendar
+
+
+			// Modify the parameters to be used in the Google Calendar subscription link
+			$data['text'] = $event_title;
+			$data['dates'] = $event_start_date . '/' . $event_end_date;
+
+			// Add custom parameter to indicate if the event is saved in the calendar
+			$data['is_saved_in_calendar'] = $is_saved_in_calendar;
+		}
+		// Enqueue the JavaScript file
+		wp_enqueue_script('add_to_calendar_event', plugin_dir_url(__FILE__) . 'js/add_to_calendar_event.js', array(), $this->version, false);
+		// Localize the script to pass the PHP variable to JavaScript
+		wp_localize_script('add_to_calendar_event', 'cal_data', $data);
+
+		return $parameters; // Return the modified or original parameters
 	}
 }
