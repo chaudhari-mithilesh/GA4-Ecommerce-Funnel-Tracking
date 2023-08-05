@@ -175,8 +175,10 @@ class Ga4_Ecommerce_Funnel_Tracking
 		$plugin_public = new Ga4_Ecommerce_Funnel_Tracking_Public($this->get_plugin_name(), $this->get_version());
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
-		if (get_option('gtm_head_script') && get_option('gtm_body_script')) {
+		if (get_option('gtm_head_script')) {
 			$this->loader->add_action('wp_head', $plugin_public, 'gtm_head_script');
+		}
+		if (get_option('gtm_body_script')) {
 			$this->loader->add_action('wp_body_open', $plugin_public, 'gtm_body_script');
 		}
 		// $this->loader->add_action('init', $plugin_public, 'form_tracking');
