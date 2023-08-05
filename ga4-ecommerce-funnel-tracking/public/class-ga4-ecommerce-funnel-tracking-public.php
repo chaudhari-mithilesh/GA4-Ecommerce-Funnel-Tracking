@@ -509,42 +509,4 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		wp_enqueue_script('purchase_complete', plugin_dir_url(__FILE__) . 'js/purchase_complete.js', array('jquery'), $this->version, false);
 		wp_localize_script('purchase_complete', 'order_data', $order_details);
 	}
-
-	// Custom functions for tracking data from the site
-
-	public function add_to_caledar_event($parameters, $event_id)
-	{
-		// Get the event object using the event ID
-		$event = get_post($event_id);
-
-		$data = array();
-
-		if ($event) {
-
-			// Extract event details
-			$event_title = $event->post_title;
-			$event_start_date = get_post_meta($event_id, '_EventStartDate', true);
-			$event_end_date = get_post_meta($event_id, '_EventEndDate', true);
-
-			// Your code to handle event details or save status
-			// ...
-
-			// Example: Check if the event is saved in the calendar
-			$is_saved_in_calendar = false; // Set this to true if the event is saved in the user's calendar
-
-
-			// Modify the parameters to be used in the Google Calendar subscription link
-			$data['text'] = $event_title;
-			$data['dates'] = $event_start_date . '/' . $event_end_date;
-
-			// Add custom parameter to indicate if the event is saved in the calendar
-			$data['is_saved_in_calendar'] = $is_saved_in_calendar;
-		}
-		// Enqueue the JavaScript file
-		wp_enqueue_script('add_to_calendar_event', plugin_dir_url(__FILE__) . 'js/add_to_calendar_event.js', array(), $this->version, false);
-		// Localize the script to pass the PHP variable to JavaScript
-		wp_localize_script('add_to_calendar_event', 'cal_data', $data);
-
-		return $parameters; // Return the modified or original parameters
-	}
 }
