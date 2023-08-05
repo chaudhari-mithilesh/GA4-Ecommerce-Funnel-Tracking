@@ -16,7 +16,7 @@
  * Plugin Name:       GA4 Ecommerce Funnel Tracking
  * Plugin URI:        https://wisdmalbs.com
  * Description:       This plugin will track the user data on customer journey through the site.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            WisdmLabs
  * Author URI:        https://wisdmalbs.com
  * License:           GPL-2.0+
