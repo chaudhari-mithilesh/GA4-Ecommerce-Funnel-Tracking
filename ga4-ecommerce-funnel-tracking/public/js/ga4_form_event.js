@@ -1,9 +1,11 @@
-console.log("gform-tracking-file");
-alert("form tracking js enqueued.");
-dataLayer.push({
-  event: form_data.form_title ? form_data.form_title : "form_tracking",
-  ecommerce: {
-    form_title: form_data.form_title,
-    form_fields: form_data.form_fields,
-  },
+jQuery(document).ready(function($) {
+  console.log('ga4_form_event.js loaded.');
+  $('.elementor-form .elementor-button[type="submit"]').click(function (event) {
+    var formData = $(this).closest('.elementor-form').serializeArray();
+    var formDataObject = {};
+    $.each(formData, function (index, field) {
+      formDataObject[field.name] = field.value;
+    });
+    gtag('event', 'form_tracking', formDataObject);
+  });
 });

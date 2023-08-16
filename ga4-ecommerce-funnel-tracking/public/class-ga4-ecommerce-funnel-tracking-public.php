@@ -74,8 +74,6 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/ga4-ecommerce-funnel-tracking-public.css', array(), $this->version, 'all');
 	}
 
 	/**
@@ -97,10 +95,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
-
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/ga4-ecommerce-funnel-tracking-public.js', array('jquery'), $this->version, false);
-		// wp_enqueue_script('ga4_form_event', plugin_dir_url(__FILE__) . 'js/ga4_form_event.js', array(), $this->version, false);
-		// wp_enqueue_script('wp-form-tracking-js', plugin_dir_url(__FILE__) . 'js/wp-form-tracking.js', array('jquery'), $this->version, false);
+		wp_enqueue_script('ga4_form_event', plugin_dir_url(__FILE__) . 'js/ga4_form_event.js', array('jquery'), $this->version, false);
 	}
 
 	/**
@@ -116,8 +111,6 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 
 	public function gtm_head_script()
 	{
-		// wp_enqueue_script('gtm-head-script', plugin_dir_url(__FILE__) . '/js/gtm_head_script.js', array(), $this->version, false);
-
 		$gtm_head_script = get_option('gtm_head_script');
 		if (!empty($gtm_head_script)) {
 			echo $gtm_head_script;
@@ -143,59 +136,67 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		}
 	}
 
+	/**
+	 * Tracks form submission data to the data layer for GTM.
+	 *
+	 * This function processes form submission data and sends it to the Google Tag Manager
+	 * data layer for tracking. It extracts form title and field values from the provided
+	 * data and attaches them to the event that is pushed to the data layer.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $confirmation The confirmation message after form submission.
+	 * @param array  $form_data    An array containing form data, including title.
+	 * @param array  $fields       An array of form fields with their values.
+	 * @return void
+	 */
 	public function wp_form_tracking($confirmation, $form_data, $fields)
 	{
-		// Get the user's information from the form submission
 		$form_title = $form_data['title'];
 		$field_values = array();
 
-		// Iterate through the form fields and extract values based on the field labels
 		foreach ($fields as $field) {
 			$value = isset($field['value']) ? $field['value'] : '';
 			$field_values[$field['name']] = $value;
 		}
 
-		// Prepare the data to be sent to Google Analytics
 		$data = array(
 			'form_title'  => $form_title,
 			'form_fields' => $field_values,
 		);
 
-?>
-		<script>
-			console.log("form-tracking-file");
-			var form_data = <?php echo json_encode($data); ?>;
-			dataLayer.push({
-				event: form_data.form_title ?
-					form_data.form_title + " form_tracking" : "form_tracking",
-				ecommerce: {
-					form_title: form_data.form_title,
-					form_fields: form_data.form_fields,
-				},
-			});
-		</script>
-<?php
+		wp_enqueue_script('wp_form_tracking_script', plugin_dir_url(__FILE__) . 'js/wp_form_tracking.js', array(), $this->version, true);
+		wp_localize_script('wp_form_tracking_script', 'form_data_object', $data);
 	}
 
+	/**
+	 * Tracks Gravity Forms submission data to the data layer for GTM.
+	 *
+	 * This function processes Gravity Forms submission data and enqueues a JavaScript script
+	 * responsible for pushing the submission data to the Google Tag Manager data layer for tracking.
+	 * It extracts form title and field values from the provided data and localizes them for the script.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $entry The entry data of the submitted form.
+	 * @param array $form  The form data containing form title and fields.
+	 * @return void
+	 */
 	function gform_tracking($entry, $form)
 	{
-		// Get the user's information from the form submission
 		$form_title = $form['title'];
 		$field_values = array();
 
-		// Iterate through the form fields and extract values based on the field labels
 		foreach ($form["fields"] as $field) {
 			$value = rgar($entry, $field->id);
 			$field_values[$field->label] = $value;
 		}
 
-		// Prepare the data to be sent to Google Analytics
 		$data = array(
 			'form_title'  => $form_title,
 			'form_fields' => $field_values,
 		);
 
-		// Enqueue the JavaScript file and pass the form data as an object to the script
 		wp_enqueue_script('form_tracking_script', plugin_dir_url(__FILE__) . 'js/gform_tracking.js', array(), '1.0', true);
 		wp_localize_script('form_tracking_script', 'form_data_object', $data);
 	}
@@ -359,8 +360,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 	 */
 
 	public function view_cart_event()
-	{
-		// die("Stopped");
+	{;
 		if (!is_cart()) {
 			return;
 		}
@@ -369,7 +369,6 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		$data = array(
 			'currency' => get_woocommerce_currency(),
 			'items' => array(),
-			// 'coupon_code' => '',
 		);
 
 		foreach ($woocommerce->cart->get_cart() as $cart_item_key => $cart_item) {
@@ -399,10 +398,6 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 
 			$data['items'][] = $item_data;
 		}
-		// if ($woocommerce->cart->applied_coupons) {
-		// 	$coupon_codes = $woocommerce->cart->get_coupons();
-		// 	$data['coupon_code'] = reset($coupon_codes)->get_code();
-		// }
 		wp_enqueue_script('view_cart', plugin_dir_url(__FILE__) . 'js/view_cart.js', array('jquery'), $this->version, false);
 		wp_localize_script('view_cart', 'cart_data', $data);
 	}
@@ -492,9 +487,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 
 	public function purchase_event($order_id)
 	{
-		// die("Hello");
 		$order = wc_get_order($order_id);
-		// var_dump($order);
 
 		$order_details = array(
 			'order_number' => $order->get_order_number(),

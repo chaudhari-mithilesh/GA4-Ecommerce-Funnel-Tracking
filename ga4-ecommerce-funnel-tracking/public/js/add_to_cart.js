@@ -1,12 +1,11 @@
 jQuery(document).ready(function () {
   console.log("Connected to cart");
-  //   dataLayer.push({ ecommerce: null });
-  dataLayer.push({
-    event: "add_to_cart",
-    ecommerce: {
-      currency: item_data["currency"],
-      value: parseFloat(item_data["value"]),
-      items: item_data["item"],
-    },
-  });
+  if (typeof dataLayer === 'undefined') {
+    window.dataLayer = [];
+  }
+  var data = {};
+  data['currency'] = item_data["currency"];
+  data['value'] = parseFloat(item_data["value"]);
+  data['items'] = item_data["item"];
+  gtag('event', 'add_to_cart', data);
 });

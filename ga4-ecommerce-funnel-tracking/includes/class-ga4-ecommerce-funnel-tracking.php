@@ -181,8 +181,8 @@ class Ga4_Ecommerce_Funnel_Tracking
 		if (get_option('gtm_body_script')) {
 			$this->loader->add_action('wp_body_open', $plugin_public, 'gtm_body_script');
 		}
-		// $this->loader->add_action('init', $plugin_public, 'form_tracking');
 		$this->loader->add_action('wpforms_frontend_confirmation_message_after', $plugin_public, 'wp_form_tracking', 10, 3);
+		$this->loader->add_action('gform_after_submission', $plugin_public, 'gform_tracking', 10, 2);
 		// $this->loader->add_action('woocommerce_add_to_cart', $plugin_public, 'add_to_cart_event', 1, 3);
 		$this->loader->add_action('wp', $plugin_public, 'list_shop_page_products');
 		$this->loader->add_action('woocommerce_before_add_to_cart_quantity', $plugin_public, 'view_single_product_event');
@@ -190,7 +190,6 @@ class Ga4_Ecommerce_Funnel_Tracking
 		// $this->loader->add_action('woocommerce_before_checkout_form', $plugin_public, 'checkout_event');
 		// $this->loader->add_action('woocommerce_thankyou', $plugin_public, 'purchase_event', 10, 1);
 		// $this->loader->add_action('woocommerce_remove_cart_item', $plugin_public, 'remove_from_cart_event', 10, 1);
-		$this->loader->add_action('gform_after_submission', $plugin_public, 'gform_tracking', 10, 2);
 		// $this->loader->add_filter('gform_confirmation', $plugin_public, 'gform_tracking', 10, 4);
 		// $this->loader->add_action('gform_pre_handle_confirmation', $plugin_public, 'gform_tracking', 10, 3);
 		// $this->loader->add_filter('gform_entry_post_save', $plugin_public, 'gform_tracking', 10, 2);
