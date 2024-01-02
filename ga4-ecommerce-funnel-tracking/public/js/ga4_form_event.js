@@ -9,3 +9,18 @@ jQuery(document).ready(function($) {
     gtag('event', 'form_tracking', formDataObject);
   });
 });
+
+jQuery(document).on('nfFormSubmitResponse', function (e, response) {
+  if (response) {
+      var form_id = response.id;
+
+if (typeof window.dataLayer === 'undefined') {
+  window.dataLayer = [];
+}
+dataLayer.push({
+event: 'form_tracking',
+form_id: form_id,
+});
+console.log('Ninja Form Data Pushed');
+  }
+});
