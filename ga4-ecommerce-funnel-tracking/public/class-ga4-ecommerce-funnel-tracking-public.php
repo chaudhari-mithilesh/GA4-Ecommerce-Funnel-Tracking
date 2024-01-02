@@ -95,6 +95,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
+		wp_enqueue_script('ga4_functions', plugin_dir_url(__FILE__) . 'js/functions.js', array('jquery'), $this->version, false);
 		wp_enqueue_script('ga4_form_event', plugin_dir_url(__FILE__) . 'js/ga4_form_event.js', array('jquery'), $this->version, false);
 	}
 
@@ -165,8 +166,17 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 			'form_fields' => $field_values,
 		);
 
-		wp_enqueue_script('wp_form_tracking_script', plugin_dir_url(__FILE__) . 'js/wp_form_tracking.js', array(), $this->version, true);
-		wp_localize_script('wp_form_tracking_script', 'form_data_object', $data);
+		?>
+		<script>
+			console.log("form-tracking-file");
+			var form_data = <?php echo json_encode($data); ?>;
+			dataLayer.push({
+				event: "form_tracking",
+				form_title: form_data.form_title,
+				form_fields: form_data.form_fields,
+			});
+		</script>
+		<?php
 	}
 
 	/**
@@ -197,8 +207,28 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 			'form_fields' => $field_values,
 		);
 
-		wp_enqueue_script('form_tracking_script', plugin_dir_url(__FILE__) . 'js/gform_tracking.js', array(), '1.0', true);
-		wp_localize_script('form_tracking_script', 'form_data_object', $data);
+		?>
+		<script>
+		jQuery(document).ready(function ($) {
+			function checkConfirmation() {
+				if ($(".gform_confirmation_message").is(":visible")) {
+					console.log("form-tracking-file");
+					if (typeof dataLayer === 'undefined') {
+						window.dataLayer = [];
+					}
+					dataLayer.push({
+						event: "form_tracking",
+						form_title: form_data.form_title,
+						form_fields: form_data.form_fields,
+					});
+				} else {
+					setTimeout(checkConfirmation, 100); // Check again after 100 milliseconds
+				}
+			}
+			checkConfirmation();
+		});
+		</script>
+		<?php
 	}
 
 
@@ -216,9 +246,6 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 
 	public function list_shop_page_products()
 	{
-		if (!is_shop()) {
-			return;
-		}
 		$data = array(
 			'currency' => get_woocommerce_currency(),
 			'items' => array(),
@@ -360,7 +387,7 @@ class Ga4_Ecommerce_Funnel_Tracking_Public
 	 */
 
 	public function view_cart_event()
-	{;
+	{
 		if (!is_cart()) {
 			return;
 		}

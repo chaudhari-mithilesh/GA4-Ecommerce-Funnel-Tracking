@@ -4,7 +4,7 @@ jQuery(document).ready(function () {
     window.dataLayer = [];
 }
 var data = {};
-data[currency] = cart_data["currency"];
-data[items] = cart_data["items"];
+data["currency"] = item_list_data["currency"];
+data["items"] = item_list_data["items"];
 gtag('event', 'list_shop_page_products', data);
 });

@@ -14,4 +14,5 @@ jQuery(document).ready(function () {
         dataLayer.push(arguments);
         console.log('form_tracking data has been pushed to dataLayer');
     };
+    console.log('ga4 functions defined');
 });
