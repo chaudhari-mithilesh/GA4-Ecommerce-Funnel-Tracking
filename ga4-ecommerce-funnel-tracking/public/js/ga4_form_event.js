@@ -17,10 +17,15 @@ jQuery(document).on('nfFormSubmitResponse', function (e, response) {
 if (typeof window.dataLayer === 'undefined') {
   window.dataLayer = [];
 }
-dataLayer.push({
-event: 'form_tracking',
-form_id: form_id,
-});
+var formData = {};
+        jQuery.each(response.data, function (key, value) {
+            formData[key] = value.value;
+        });
+        window.dataLayer.push({
+            event: 'form_tracking',
+            form_id: form_id,
+            form_data: formData
+        });
 console.log('Ninja Form Data Pushed');
   }
 });
