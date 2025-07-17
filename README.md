@@ -1,116 +1,60 @@
-=== Plugin Name === Contributors: (this should be a list of
-wordpress.org userid\'s) Donate link: https://wisdmalbs.com Tags:
-comments, spam Requires at least: 3.0.1 Tested up to: 3.4 Stable tag:
-4.3 License: GPLv2 or later License URI:
-http://www.gnu.org/licenses/gpl-2.0.html
+# GA4 Ecommerce Funnel Tracking
 
-Here is a short description of the plugin. This should be no more than
-150 characters. No markup here.
+## Description
 
-== Description ==
+GA4 Ecommerce Funnel Tracking is a WordPress plugin that helps track user data throughout the customer journey on your site. It integrates with Google Analytics 4 (GA4) to provide detailed insights into your ecommerce funnel.
 
-This is the long description. No limit, and you can use Markdown (as
-well as in the following sections).
+## Features
 
-For backwards compatibility, if this section is missing, the full length
-of the short description will be used, and Markdown parsed.
+- Track customer journey through your site
+- Integrate with Google Analytics 4 (GA4)
+- Monitor ecommerce funnel metrics
+- User-friendly admin interface
+- Secure and reliable data tracking
+- Compatible with WordPress 3.0.1 and above
 
-A few notes about the sections above:
+## Installation
 
-\* \"Contributors\" is a comma separated list of wp.org/wp-plugins.org
-usernames \* \"Tags\" is a comma separated list of tags that apply to
-the plugin \* \"Requires at least\" is the lowest version that the
-plugin will work on \* \"Tested up to\" is the highest version that
-you\'ve \*successfully used to test the plugin\*. Note that it might
-work on higher versions\... this is just the highest one you\'ve
-verified. \* Stable tag should indicate the Subversion \"tag\" of the
-latest stable version, or \"trunk,\" if you use \`/trunk/\` for stable.
+1. Upload [ga4-ecommerce-funnel-tracking.php](cci:7://file:///e:/Wisdmlabs%20Data/GA4%20Projects/GA4%20Plugin/GA4%20Plugin%20Git%20Repository%20Local/GA4-Ecommerce-Funnel-Tracking/ga4-ecommerce-funnel-tracking.php:0:0-0:0) to the `/wp-content/plugins/` directory
+2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Configure your GA4 settings in the plugin settings page
 
-Note that the \`readme.txt\` of the stable tag is the one that is
-considered the defining one for the plugin, so if the
-\`/trunk/readme.txt\` file says that the stable tag is \`4.3\`, then it
-is \`/tags/4.3/readme.txt\` that\'ll be used for displaying information
-about the plugin. In this situation, the only thing considered from the
-trunk \`readme.txt\` is the stable tag pointer. Thus, if you develop in
-trunk, you can update the trunk \`readme.txt\` to reflect changes in
-your in-development version, without having that information incorrectly
-disclosed about the current stable version that lacks those changes \--
-as long as the trunk\'s \`readme.txt\` points to the correct stable tag.
+## Requirements
 
-If no stable tag is provided, it is assumed that trunk is stable, but
-you should specify \"trunk\" if that\'s where you put the stable
-version, in order to eliminate any doubt.
+- WordPress 3.0.1 or higher
+- PHP 5.2.4 or higher
+- Google Analytics 4 (GA4) account
 
-== Installation ==
+## Usage
 
-This section describes how to install the plugin and get it working.
+1. After activation, go to the plugin settings page in WordPress admin
+2. Enter your GA4 Measurement ID
+3. The plugin will automatically start tracking ecommerce events
+4. View your funnel data in your GA4 dashboard
 
-e.g.
+## Support
 
-1\. Upload \`ga4-ecommerce-funnel-tracking.php\` to the
-\`/wp-content/plugins/\` directory 1. Activate the plugin through the
-\'Plugins\' menu in WordPress 1. Place \`\<?php
-do_action(\'plugin_name_hook\'); ?\>\` in your templates
+For support and documentation, visit: https://wisdmalbs.com
 
-== Frequently Asked Questions ==
+## License
 
-= A question that someone might have =
+This plugin is licensed under the GPL v2 or later.
 
-An answer to that question.
+## Changelog
 
-= What about foo bar? =
+### 1.0.2
+- Initial public release
+- Added basic ecommerce tracking functionality
+- Implemented GA4 integration
 
-Answer to foo bar dilemma.
+### 1.0.0
+- Plugin structure setup
+- Basic framework implementation
 
-== Screenshots ==
+## Contributing
 
-1\. This screen shot description corresponds to
-screenshot-1.(png\|jpg\|jpeg\|gif). Note that the screenshot is taken
-from the /assets directory or the directory that contains the stable
-readme.txt (tags or trunk). Screenshots in the /assets directory take
-precedence. For example, \`/assets/screenshot-1.png\` would win over
-\`/tags/4.3/screenshot-1.png\` (or jpg, jpeg, gif). 2. This is the
-second screen shot
+Contributions are welcome! Please submit a pull request with your changes.
 
-== Changelog ==
+## License
 
-= 1.0 = \* A change since the previous version. \* Another change.
-
-= 0.5 = \* List versions from most recent at top to oldest at bottom.
-
-== Upgrade Notice ==
-
-= 1.0 = Upgrade notices describe the reason a user should upgrade. No
-more than 300 characters.
-
-= 0.5 = This version fixes a security related bug. Upgrade immediately.
-
-== Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones
-above. This may be of use for extremely complicated plugins where more
-information needs to be conveyed that doesn\'t fit into the categories
-of \"description\" or \"installation.\" Arbitrary sections will be shown
-below the built-in sections outlined above.
-
-== A brief Markdown Example ==
-
-Ordered list:
-
-1\. Some feature 1. Another feature 1. Something else about the plugin
-
-Unordered list:
-
-\* something \* something else \* third thing
-
-Here\'s a link to \[WordPress\](http://wordpress.org/ \"Your favorite
-software\") and one to \[Markdown\'s Syntax Documentation\]\[markdown
-syntax\]. Titles are optional, naturally.
-
-\[markdown syntax\]: http://daringfireball.net/projects/markdown/syntax
-\"Markdown is what the parser uses to process much of the readme file\"
-
-Markdown uses email style notation for blockquotes and I\'ve been told:
-\> Asterisks for \*emphasis\*. Double it up for \*\*strong\*\*.
-
-\`\<?php code(); // goes in backticks ?\>\`
+GPLv2 or later
